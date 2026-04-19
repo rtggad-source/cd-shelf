@@ -7,7 +7,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>SHELF</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
@@ -35,7 +34,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .tab{padding:10px 14px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;flex-shrink:0;}
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-/* GENRE FILTER BAR */
 .filters{padding:10px 20px;display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
 .filters::-webkit-scrollbar{display:none;}
 .chip{padding:4px 10px;border:1px solid var(--border);background:transparent;color:var(--text2);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;cursor:pointer;white-space:nowrap;flex-shrink:0;}
@@ -44,7 +42,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 
 .main{padding-bottom:calc(60px + var(--safe));}
 .flat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;}
-
 .artist-group-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--border);cursor:pointer;background:var(--surface);user-select:none;}
 .artist-group-header:active{background:var(--surface2);}
 .agh-left{display:flex;align-items:center;gap:10px;}
@@ -54,7 +51,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .agh-arrow.open{transform:rotate(90deg);}
 .album-grid{display:none;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;}
 .album-grid.open{display:grid;}
-
 .album-card{background:var(--surface);border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;}
 .album-card:active{border-color:var(--accent);}
 .album-art{width:100%;aspect-ratio:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;}
@@ -120,24 +116,35 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .scan-top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;flex-shrink:0;}
 .scan-title-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);letter-spacing:2px;}
 .scan-close{background:none;border:1px solid var(--border);color:var(--text2);padding:7px 14px;font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;}
-
-/* scan tabs */
 .scan-tabs{display:flex;width:100%;border-bottom:1px solid var(--border);flex-shrink:0;}
 .scan-tab{flex:1;padding:10px;text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;}
 .scan-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
 /* camera panel */
-.scan-camera-panel{display:flex;flex-direction:column;align-items:center;gap:14px;padding:20px;width:100%;}
-.scan-hint-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-align:center;line-height:1.8;letter-spacing:1px;}
-.scan-status{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);text-align:center;min-height:16px;}
-/* tap-to-focus overlay */
-.camera-wrap{position:relative;width:100%;max-width:340px;}
-#reader{width:100%;overflow:hidden;border:1px solid var(--border);}
-.focus-tap-hint{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:1px;text-align:center;margin-top:4px;}
-.focus-ring{position:absolute;width:60px;height:60px;border:2px solid var(--accent);border-radius:50%;pointer-events:none;display:none;transform:translate(-50%,-50%);animation:focusPulse 0.4s ease forwards;}
-@keyframes focusPulse{0%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
+.scan-camera-panel{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;width:100%;}
 
-/* barcode manual panel */
+/* VIDEO element — ZXing renders directly into this */
+.video-wrap{position:relative;width:100%;max-width:360px;background:#111;border:1px solid var(--border);}
+#scanVideo{width:100%;display:block;object-fit:cover;}
+/* scanning guide overlay */
+.scan-guide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.scan-guide-inner{width:80%;height:80px;position:relative;}
+.sg-corner{position:absolute;width:18px;height:18px;border-color:var(--accent);border-style:solid;}
+.sg-corner.tl{top:0;left:0;border-width:2px 0 0 2px;}
+.sg-corner.tr{top:0;right:0;border-width:2px 2px 0 0;}
+.sg-corner.bl{bottom:0;left:0;border-width:0 0 2px 2px;}
+.sg-corner.br{bottom:0;right:0;border-width:0 2px 2px 0;}
+.scan-line{position:absolute;left:0;right:0;height:1px;background:var(--accent);box-shadow:0 0 6px var(--accent);animation:scanAnim 1.8s ease-in-out infinite alternate;top:0;}
+@keyframes scanAnim{from{top:5%}to{top:95%}}
+
+/* tap-to-focus */
+.focus-ring{position:absolute;width:56px;height:56px;border:2px solid var(--accent);border-radius:50%;pointer-events:none;display:none;transform:translate(-50%,-50%);animation:focusPulse 0.45s ease forwards;}
+@keyframes focusPulse{0%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8)}}
+
+.scan-hint-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-align:center;line-height:1.8;letter-spacing:1px;}
+.scan-status{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);text-align:center;min-height:16px;padding:0 20px;}
+
+/* barcode / manual panels */
 .scan-manual-panel{display:none;flex-direction:column;gap:12px;padding:20px;width:100%;}
 .scan-manual-panel.active{display:flex;}
 .field-group{display:flex;flex-direction:column;gap:6px;}
@@ -191,7 +198,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 
 <div class="filters" id="genreFilterBar">
   <button class="chip active" onclick="setGenreFilter('',this)">All</button>
-  <!-- genre chips injected by JS -->
   <select class="sort-select" id="sortSelect" onchange="renderCollection()">
     <option value="artist">Artist A–Z</option>
     <option value="title">Title A–Z</option>
@@ -209,7 +215,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   <div id="collectionContainer"></div>
 </div>
 
-<!-- DISCOGRAPHY -->
 <div id="discoView" class="hidden main disco-view">
   <div class="disco-header">
     <button class="back-btn" onclick="closeDisco()">← BACK</button>
@@ -219,7 +224,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   <div id="discoList"></div>
 </div>
 
-<!-- DETAIL SHEET -->
 <div class="sheet-overlay" id="sheetOverlay" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet">
   <div class="sheet-handle"></div>
@@ -249,25 +253,30 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <span class="scan-title-txt">ADD ALBUM</span>
     <button class="scan-close" onclick="closeScan()">CLOSE</button>
   </div>
-
   <div class="scan-tabs">
     <div class="scan-tab active" id="stCamera" onclick="switchScanTab('camera')">📷 Camera</div>
     <div class="scan-tab" id="stBarcode" onclick="switchScanTab('barcode')"># Barcode</div>
     <div class="scan-tab" id="stManual" onclick="switchScanTab('manual')">✎ Manual</div>
   </div>
 
-  <!-- CAMERA TAB -->
+  <!-- CAMERA -->
   <div class="scan-camera-panel" id="panelCamera">
-    <div class="scan-hint-txt">Hold barcode steady in frame<br>Tap camera to focus</div>
-    <div class="camera-wrap" id="cameraWrap">
-      <div id="reader"></div>
+    <div class="scan-hint-txt">Hold barcode in frame · Tap to focus</div>
+    <div class="video-wrap" id="videoWrap">
+      <video id="scanVideo" autoplay muted playsinline></video>
+      <div class="scan-guide">
+        <div class="scan-guide-inner">
+          <div class="sg-corner tl"></div><div class="sg-corner tr"></div>
+          <div class="sg-corner bl"></div><div class="sg-corner br"></div>
+          <div class="scan-line"></div>
+        </div>
+      </div>
       <div class="focus-ring" id="focusRing"></div>
     </div>
-    <div class="focus-tap-hint">TAP TO FOCUS</div>
     <div class="scan-status" id="scanStatus"></div>
   </div>
 
-  <!-- BARCODE TAB -->
+  <!-- BARCODE -->
   <div class="scan-manual-panel" id="panelBarcode">
     <div class="field-group">
       <div class="field-label">Barcode Number</div>
@@ -279,7 +288,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div class="scan-status" id="barcodeStatus"></div>
   </div>
 
-  <!-- MANUAL TAB -->
+  <!-- MANUAL -->
   <div class="scan-manual-panel" id="panelManual">
     <div class="field-group">
       <div class="field-label">Artist</div>
@@ -296,9 +305,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
       </div>
       <div class="field-group">
         <div class="field-label">Genre</div>
-        <div class="genre-wrap" style="flex:1;">
-          <select class="genre-select" id="manGenre"></select>
-        </div>
+        <div class="genre-wrap"><select class="genre-select" id="manGenre"></select></div>
       </div>
     </div>
     <button class="scan-lookup-btn" onclick="lookupManualArtistTitle()">SEARCH MUSICBRAINZ</button>
@@ -322,8 +329,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 
 <div class="toast" id="toast"></div>
 
-<script>
-// ── GENRES ──
+<script type="module">
+// ── ZXing import (ES module) ──
+import {BrowserMultiFormatReader, BarcodeFormat, DecodeHintType} from 'https://esm.sh/@zxing/library@0.20.0';
+
 const GENRES=[
   'Alternative Rock','Ambient','Blues','Classical','Country','Dream Pop',
   'Electronic','Experimental','Folk','Funk','Gospel','Grunge','Hard Rock',
@@ -340,18 +349,15 @@ function buildGenreSelect(elId,current){
     GENRES.map(g=>`<option value="${g}"${g===current?' selected':''}>${g}</option>`).join('');
 }
 
-// build genre filter chips from collection genres
 function buildGenreFilterChips(){
   const bar=document.getElementById('genreFilterBar');
-  // remove old genre chips (keep All chip and sort select)
   bar.querySelectorAll('.chip.genre-chip').forEach(c=>c.remove());
   const sortSel=bar.querySelector('.sort-select');
-  const usedGenres=[...new Set(collection.map(a=>a.genre).filter(Boolean))].sort();
-  usedGenres.forEach(g=>{
+  const used=[...new Set(collection.map(a=>a.genre).filter(Boolean))].sort();
+  used.forEach(g=>{
     const btn=document.createElement('button');
     btn.className='chip genre-chip'+(activeGenre===g?' active':'');
-    btn.textContent=g;
-    btn.onclick=()=>setGenreFilter(g,btn);
+    btn.textContent=g;btn.onclick=()=>setGenreFilter(g,btn);
     bar.insertBefore(btn,sortSel);
   });
 }
@@ -359,8 +365,7 @@ function buildGenreFilterChips(){
 // ── STATE ──
 let db,collection=[],viewMode='grid',activeGenre='';
 let currentAlbumId=null,openArtistGroups=new Set();
-let html5QrCode=null,scannerRunning=false;
-let videoStream=null;
+let codeReader=null,scanActive=false,videoStream=null;
 
 // ── DB ──
 function initDB(){
@@ -374,12 +379,10 @@ function dbGetAll(s){return new Promise((r,j)=>{const t=db.transaction(s,'readon
 function dbPut(s,o){return new Promise((r,j)=>{const t=db.transaction(s,'readwrite');const q=t.objectStore(s).put(o);q.onsuccess=()=>r(q.result);q.onerror=j;});}
 function dbDelete(s,k){return new Promise((r,j)=>{const t=db.transaction(s,'readwrite');const q=t.objectStore(s).delete(k);q.onsuccess=r;q.onerror=j;});}
 
-// ── LOAD ──
 async function loadCollection(){
   collection=await dbGetAll('albums');
   updateStats();buildGenreFilterChips();renderCollection();
-  buildGenreSelect('genreSelect','');
-  buildGenreSelect('manGenre','');
+  buildGenreSelect('genreSelect','');buildGenreSelect('manGenre','');
 }
 
 function updateStats(){
@@ -402,8 +405,7 @@ function getFiltered(){
 }
 
 function renderCollection(){
-  const c=document.getElementById('collectionContainer');
-  const e=document.getElementById('emptyState');
+  const c=document.getElementById('collectionContainer'),e=document.getElementById('emptyState');
   const items=getFiltered();
   if(!items.length){c.innerHTML='';e.classList.remove('hidden');return;}
   e.classList.add('hidden');
@@ -436,16 +438,13 @@ function albumCardHTML(a){
   </div>`;
 }
 
-function toggleArtistGroup(artist){openArtistGroups.has(artist)?openArtistGroups.delete(artist):openArtistGroups.add(artist);renderCollection();}
-function setViewMode(mode,el){viewMode=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');openArtistGroups.clear();renderCollection();}
-function setGenreFilter(genre,el){
-  activeGenre=genre;
-  document.querySelectorAll('#genreFilterBar .chip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');renderCollection();
-}
+// expose to onclick
+window.toggleArtistGroup=function(artist){openArtistGroups.has(artist)?openArtistGroups.delete(artist):openArtistGroups.add(artist);renderCollection();};
+window.setViewMode=function(mode,el){viewMode=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');openArtistGroups.clear();renderCollection();};
+window.setGenreFilter=function(genre,el){activeGenre=genre;document.querySelectorAll('#genreFilterBar .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderCollection();};
 
 // ── SHEET ──
-async function openSheet(id){
+window.openSheet=async function(id){
   const a=collection.find(x=>x.id===id);if(!a)return;
   currentAlbumId=id;
   document.getElementById('sheetArtist').textContent=a.artist||'';
@@ -465,166 +464,187 @@ async function openSheet(id){
       tr.innerHTML=tracks.length?tracks.map((t,i)=>`<div class="track"><span class="track-num">${String(i+1).padStart(2,'0')}</span><span class="track-name">${escHTML(t.title)}</span><span class="track-dur">${msToTime(t.length)}</span></div>`).join(''):'<div class="loading-tracks" style="color:var(--text3)">No tracklist</div>';
     }catch{tr.innerHTML='<div class="loading-tracks" style="color:var(--text3)">Could not load</div>';}
   }else{tr.innerHTML='<div class="loading-tracks" style="color:var(--text3)">No data</div>';}
-}
+};
 
-function closeSheet(){document.getElementById('sheet').classList.remove('open');document.getElementById('sheetOverlay').classList.remove('open');currentAlbumId=null;}
+window.closeSheet=function(){document.getElementById('sheet').classList.remove('open');document.getElementById('sheetOverlay').classList.remove('open');currentAlbumId=null;};
 
-async function saveSheet(){
+window.saveSheet=async function(){
   if(!currentAlbumId)return;
   const a=collection.find(x=>x.id===currentAlbumId);if(!a)return;
   a.memo=document.getElementById('memoArea').value.trim();
   a.genre=document.getElementById('genreSelect').value;
   await dbPut('albums',a);buildGenreFilterChips();renderCollection();closeSheet();showToast('Saved');
-}
+};
 
-async function deleteAlbum(){
+window.deleteAlbum=async function(){
   if(!currentAlbumId)return;
   if(!confirm('Remove this album?'))return;
   await dbDelete('albums',currentAlbumId);
   collection=collection.filter(a=>a.id!==currentAlbumId);
   updateStats();buildGenreFilterChips();renderCollection();closeSheet();showToast('Removed');
+};
+
+// ── ZXING SCANNER ──
+function buildReader(){
+  const hints=new Map();
+  // Only EAN/UPC for speed and accuracy
+  hints.set(DecodeHintType.POSSIBLE_FORMATS,[
+    BarcodeFormat.EAN_13,
+    BarcodeFormat.EAN_8,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E
+  ]);
+  hints.set(DecodeHintType.TRY_HARDER,true);
+  return new BrowserMultiFormatReader(hints,500); // 500ms between attempts
 }
 
-// ── SCAN OVERLAY ──
-let currentScanTab='camera';
+async function startCamera(){
+  if(scanActive)return;
+  setStatus('scanStatus','Starting camera...');
+  try{
+    // Get highest-res rear camera stream
+    videoStream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:'environment'},
+        width:{ideal:1920},
+        height:{ideal:1080},
+        focusMode:{ideal:'continuous'}
+      }
+    });
+    const video=document.getElementById('scanVideo');
+    video.srcObject=videoStream;
+    await video.play();
 
-function openScan(tab){
-  tab=tab||'camera';
+    if(!codeReader)codeReader=buildReader();
+
+    scanActive=true;
+    setStatus('scanStatus','');
+    setupTapFocus();
+    scanLoop(video);
+  }catch(err){
+    console.warn('Camera error:',err);
+    setStatus('scanStatus','Camera unavailable — use Barcode or Manual tab');
+  }
+}
+
+// Continuous decode loop using ZXing
+async function scanLoop(video){
+  if(!codeReader)return;
+  while(scanActive){
+    try{
+      const result=await codeReader.decodeOnceFromVideoElement(video);
+      if(result&&scanActive){
+        const code=result.getText();
+        scanActive=false; // pause while processing
+        setStatus('scanStatus',`Found: ${code}`);
+        await processBarcode(code,'scanStatus');
+        return;
+      }
+    }catch(e){
+      // NotFoundException is normal — just keep looping
+      if(e?.name==='NotFoundException'||e?.message?.includes('No MultiFormat Readers')){
+        await sleep(300);
+      }else{
+        console.warn('Scan error:',e);
+        await sleep(500);
+      }
+    }
+  }
+}
+
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function stopCamera(){
+  scanActive=false;
+  if(codeReader){codeReader.reset();codeReader=null;}
+  if(videoStream){videoStream.getTracks().forEach(t=>t.stop());videoStream=null;}
+  const video=document.getElementById('scanVideo');
+  if(video)video.srcObject=null;
+}
+
+function setupTapFocus(){
+  const wrap=document.getElementById('videoWrap');
+  const ring=document.getElementById('focusRing');
+  // Remove old listener by cloning
+  const newWrap=wrap.cloneNode(true);
+  wrap.parentNode.replaceChild(newWrap,wrap);
+  newWrap.addEventListener('click',async e=>{
+    const rect=newWrap.getBoundingClientRect();
+    const x=e.clientX-rect.left,y=e.clientY-rect.top;
+    const fr=document.getElementById('focusRing');
+    fr.style.left=x+'px';fr.style.top=y+'px';fr.style.display='block';
+    fr.style.animation='none';void fr.offsetWidth;fr.style.animation='focusPulse 0.45s ease forwards';
+    setTimeout(()=>fr.style.display='none',500);
+    try{
+      if(videoStream){
+        const track=videoStream.getVideoTracks()[0];
+        const caps=track.getCapabilities?.();
+        if(caps?.focusMode?.includes('manual')){
+          await track.applyConstraints({advanced:[{focusMode:'manual',pointsOfInterest:[{x:x/rect.width,y:y/rect.height}]}]});
+          setTimeout(()=>track.applyConstraints({advanced:[{focusMode:'continuous'}]}).catch(()=>{}),1500);
+        }
+      }
+    }catch{}
+  });
+}
+
+// ── SCAN UI ──
+window.openScan=function(tab){
   document.getElementById('scanOverlay').classList.add('open');
   clearScanStatus();
-  switchScanTab(tab);
-}
+  switchScanTab(tab||'camera');
+};
 
-function closeScan(){
+window.closeScan=function(){
   stopCamera();
   document.getElementById('scanOverlay').classList.remove('open');
   clearScanStatus();
-}
+};
 
 function clearScanStatus(){
-  ['scanStatus','barcodeStatus','manualStatus'].forEach(id=>{
-    const el=document.getElementById(id);if(el)el.textContent='';
-  });
+  ['scanStatus','barcodeStatus','manualStatus'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
   const bi=document.getElementById('barcodeInput');if(bi)bi.value='';
 }
 
-function switchScanTab(tab){
-  currentScanTab=tab;
+window.switchScanTab=function(tab){
   ['camera','barcode','manual'].forEach(t=>{
-    document.getElementById('stCamera'.replace('camera',t==='camera'?'Camera':t==='barcode'?'Barcode':'Manual')).classList.toggle('active',t===tab);
+    const tid={camera:'stCamera',barcode:'stBarcode',manual:'stManual'}[t];
+    document.getElementById(tid).classList.toggle('active',t===tab);
   });
-  // fix: use correct IDs
-  document.getElementById('stCamera').classList.toggle('active',tab==='camera');
-  document.getElementById('stBarcode').classList.toggle('active',tab==='barcode');
-  document.getElementById('stManual').classList.toggle('active',tab==='manual');
   document.getElementById('panelCamera').style.display=tab==='camera'?'flex':'none';
   document.getElementById('panelBarcode').classList.toggle('active',tab==='barcode');
   document.getElementById('panelManual').classList.toggle('active',tab==='manual');
   if(tab==='camera')startCamera();
   else stopCamera();
   if(tab==='manual')buildGenreSelect('manGenre','');
-}
-
-// ── CAMERA ──
-function startCamera(){
-  if(scannerRunning)return;
-  if(!html5QrCode)html5QrCode=new Html5Qrcode('reader');
-  html5QrCode.start(
-    {facingMode:'environment'},
-    {
-      fps:15,
-      qrbox:{width:260,height:110},
-      aspectRatio:1.6,
-      formatsToSupport:[
-        Html5QrcodeSupportedFormats.EAN_13,
-        Html5QrcodeSupportedFormats.EAN_8,
-        Html5QrcodeSupportedFormats.UPC_A,
-        Html5QrcodeSupportedFormats.UPC_E
-      ],
-      experimentalFeatures:{useBarCodeDetectorIfSupported:true}
-    },
-    async(code)=>{
-      if(!scannerRunning)return;
-      scannerRunning=false;
-      document.getElementById('scanStatus').textContent=`Found: ${code}`;
-      await processBarcode(code,'scanStatus');
-    },
-    ()=>{}
-  ).then(()=>{
-    scannerRunning=true;
-    // tap-to-focus
-    setupTapFocus();
-  }).catch(err=>{
-    console.warn('Camera:',err);
-    document.getElementById('scanStatus').textContent='Camera unavailable — use Barcode or Manual tab';
-  });
-}
-
-function stopCamera(){
-  if(html5QrCode&&scannerRunning){html5QrCode.stop().catch(()=>{});scannerRunning=false;}
-}
-
-function setupTapFocus(){
-  const wrap=document.getElementById('cameraWrap');
-  const ring=document.getElementById('focusRing');
-  wrap.addEventListener('click',async e=>{
-    const rect=wrap.getBoundingClientRect();
-    const x=e.clientX-rect.left,y=e.clientY-rect.top;
-    // show ring
-    ring.style.left=x+'px';ring.style.top=y+'px';
-    ring.style.display='block';
-    ring.style.animation='none';void ring.offsetWidth;
-    ring.style.animation='focusPulse 0.4s ease forwards';
-    setTimeout(()=>ring.style.display='none',400);
-    // attempt focus via constraints
-    try{
-      const video=document.querySelector('#reader video');
-      if(video&&video.srcObject){
-        const track=video.srcObject.getVideoTracks()[0];
-        if(track&&track.getCapabilities){
-          const caps=track.getCapabilities();
-          if(caps.focusMode&&caps.focusMode.includes('manual')){
-            const xNorm=(x/rect.width),yNorm=(y/rect.height);
-            await track.applyConstraints({advanced:[{focusMode:'manual',pointsOfInterest:[{x:xNorm,y:yNorm}]}]});
-            setTimeout(()=>track.applyConstraints({advanced:[{focusMode:'continuous'}]}),1500);
-          }else if(caps.focusMode&&caps.focusMode.includes('continuous')){
-            await track.applyConstraints({advanced:[{focusMode:'continuous'}]});
-          }
-        }
-      }
-    }catch(e){/* focus API not supported on this device */}
-  });
-}
+};
 
 // ── BARCODE LOOKUP ──
-document.addEventListener('DOMContentLoaded',()=>{
-  const bi=document.getElementById('barcodeInput');
-  if(bi)bi.addEventListener('keydown',e=>{if(e.key==='Enter')lookupBarcode();});
-});
+document.getElementById('barcodeInput').addEventListener('keydown',e=>{if(e.key==='Enter')lookupBarcode();});
 
-async function lookupBarcode(){
+window.lookupBarcode=async function(){
   const raw=document.getElementById('barcodeInput').value.trim().replace(/\D/g,'');
   if(!raw)return;
-  document.getElementById('barcodeStatus').textContent='Looking up...';
+  setStatus('barcodeStatus','Looking up...');
   await processBarcode(raw,'barcodeStatus');
-}
+};
 
 async function processBarcode(barcode,statusId){
   if(collection.find(a=>a.barcode===barcode)){showToast('Already in collection');closeScan();return;}
   setStatus(statusId,'Looking up...');
   try{
     const album=await fetchByBarcode(barcode);
-    if(!album){setStatus(statusId,'Not found. Try another or use Manual tab.');scannerRunning=true;return;}
+    if(!album){setStatus(statusId,'Not found. Try Manual tab.');scanActive=true;if(statusId==='scanStatus')scanLoop(document.getElementById('scanVideo'));return;}
     album.barcode=barcode;album.addedAt=Date.now();
     const id=await dbPut('albums',album);album.id=id;collection.push(album);
     updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${album.title}`);
-  }catch(e){console.error(e);setStatus(statusId,'Error. Check connection.');scannerRunning=true;}
+  }catch(e){console.error(e);setStatus(statusId,'Error. Check connection.');scanActive=true;}
 }
 
 function setStatus(id,msg){const el=document.getElementById(id);if(el)el.textContent=msg;}
 
-// ── MANUAL ADD ──
-async function lookupManualArtistTitle(){
+// ── MANUAL ──
+window.lookupManualArtistTitle=async function(){
   const artist=document.getElementById('manArtist').value.trim();
   const title=document.getElementById('manTitle').value.trim();
   if(!artist||!title){setStatus('manualStatus','Enter artist and title first.');return;}
@@ -635,28 +655,22 @@ async function lookupManualArtistTitle(){
     const data=await res.json();
     if(!data.releases?.length){setStatus('manualStatus','Not found. Use "Add Without Lookup".');return;}
     const rel=data.releases[0];
-    const mbid=rel.id;
-    const rgid=rel['release-group']?.id;
+    const mbid=rel.id,rgid=rel['release-group']?.id;
     const year=rel.date?parseInt(rel.date):null;
     let genre=document.getElementById('manGenre').value||'';
     if(!genre){
-      try{
-        const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
-        const td=await tr.json();
-        const tags=td.tags||[];
-        if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);
-      }catch{}
+      try{const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});const td=await tr.json();const tags=td.tags||[];if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);}catch{}
     }
     let coverUrl=null;
     try{const cr=await fetch(`https://coverartarchive.org/release/${mbid}/front-250`,{method:'HEAD'});if(cr.ok)coverUrl=`https://coverartarchive.org/release/${mbid}/front-250`;}catch{}
-    const album={mbid,releaseGroupId:rgid,artist:rel['artist-credit']?.[0]?.artist?.name||artist,title:rel.title||title,year:year||parseInt(document.getElementById('manYear').value)||null,genre,coverUrl,memo:'',addedAt:Date.now()};
     if(collection.find(a=>a.mbid===mbid)){showToast('Already in collection');closeScan();return;}
+    const album={mbid,releaseGroupId:rgid,artist:rel['artist-credit']?.[0]?.artist?.name||artist,title:rel.title||title,year:year||parseInt(document.getElementById('manYear').value)||null,genre,coverUrl,memo:'',addedAt:Date.now()};
     const id=await dbPut('albums',album);album.id=id;collection.push(album);
     updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${album.title}`);
   }catch(e){console.error(e);setStatus('manualStatus','Error. Check connection.');}
-}
+};
 
-async function addManual(){
+window.addManual=async function(){
   const artist=document.getElementById('manArtist').value.trim();
   const title=document.getElementById('manTitle').value.trim();
   if(!artist||!title){setStatus('manualStatus','Artist and title are required.');return;}
@@ -665,7 +679,7 @@ async function addManual(){
   const album={artist,title,year,genre,coverUrl:null,memo:'',addedAt:Date.now()};
   const id=await dbPut('albums',album);album.id=id;collection.push(album);
   updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${title}`);
-}
+};
 
 // ── MUSICBRAINZ ──
 async function fetchByBarcode(barcode){
@@ -677,12 +691,7 @@ async function fetchByBarcode(barcode){
   const year=rel.date?parseInt(rel.date):null;
   const mbid=rel.id,rgid=rel['release-group']?.id;
   let genre='';
-  try{
-    const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
-    const td=await tr.json();
-    const tags=td.tags||[];
-    if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);
-  }catch{}
+  try{const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});const td=await tr.json();const tags=td.tags||[];if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);}catch{}
   let coverUrl=null;
   try{const cr=await fetch(`https://coverartarchive.org/release/${mbid}/front-250`,{method:'HEAD'});if(cr.ok)coverUrl=`https://coverartarchive.org/release/${mbid}/front-250`;}catch{}
   return{mbid,releaseGroupId:rgid,artist,title:rel.title||'Unknown Title',year,genre,coverUrl,memo:''};
@@ -691,8 +700,7 @@ async function fetchByBarcode(barcode){
 function mapGenre(raw){
   if(!raw)return'';const r=raw.toLowerCase();
   const map=[['alternative rock','Alternative Rock'],['alt-rock','Alternative Rock'],['ambient','Ambient'],['blues','Blues'],['classical','Classical'],['country','Country'],['dream pop','Dream Pop'],['electronic','Electronic'],['electronica','Electronic'],['experimental','Experimental'],['folk','Folk'],['funk','Funk'],['gospel','Gospel'],['grunge','Grunge'],['hard rock','Hard Rock'],['heavy metal','Heavy Metal'],['metal','Heavy Metal'],['hip hop','Hip-Hop'],['hip-hop','Hip-Hop'],['rap','Hip-Hop'],['house','House'],['indie rock','Indie Rock'],['indie','Indie Rock'],['jazz','Jazz'],['j-pop','J-Pop'],['jpop','J-Pop'],['j-rock','J-Rock'],['jrock','J-Rock'],['latin','Latin'],['math rock','Math Rock'],['new wave','New Wave'],['noise rock','Noise Rock'],['pop','Pop'],['post-punk','Post-Punk'],['post-rock','Post-Rock'],['progressive rock','Progressive Rock'],['prog rock','Progressive Rock'],['psychedelic','Psychedelic Rock'],['punk','Punk'],['r&b','R&B / Soul'],['soul','R&B / Soul'],['rhythm and blues','R&B / Soul'],['reggae','Reggae'],['rock','Rock'],['shoegaze','Shoegaze'],['singer-songwriter','Singer-Songwriter'],['ska','Ska'],['soundtrack','Soundtrack'],['synth-pop','Synth-Pop'],['synthpop','Synth-Pop'],['techno','Techno'],['trip-hop','Trip-Hop'],['trip hop','Trip-Hop'],['world','World'],['world music','World']];
-  for(const[k,v]of map)if(r.includes(k))return v;
-  return'';
+  for(const[k,v]of map)if(r.includes(k))return v;return'';
 }
 
 async function fetchTracklist(mbid){
@@ -705,13 +713,9 @@ async function fetchTracklist(mbid){
 function msToTime(ms){if(!ms)return'';const s=Math.round(ms/1000);return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;}
 
 // ── DISCOGRAPHY ──
-function showMain(){
-  document.getElementById('mainContent').classList.remove('hidden');
-  document.getElementById('discoView').classList.add('hidden');
-  document.getElementById('navCollection').classList.add('active');
-}
+window.showMain=function(){document.getElementById('mainContent').classList.remove('hidden');document.getElementById('discoView').classList.add('hidden');document.getElementById('navCollection').classList.add('active');};
 
-async function openDisco(artistName){
+window.openDisco=async function(artistName){
   if(!artistName)return;
   document.getElementById('mainContent').classList.add('hidden');
   document.getElementById('discoView').classList.remove('hidden');
@@ -740,24 +744,25 @@ async function openDisco(artistName){
       return`<div class="disco-item ${isOwned?'owned':''}"><div class="disco-art">${imgHTML}</div><div class="disco-info"><div class="disco-title">${escHTML(rg.title)}</div><div class="disco-year">${year}</div></div><div class="owned-badge ${isOwned?'yes':'no'}">${isOwned?'OWNED':'—'}</div></div>`;
     }).join('');
   }catch(e){console.error(e);document.getElementById('discoList').innerHTML='<div class="disco-loading">Could not load. Check connection.</div>';}
-}
+};
 
-function closeDisco(){showMain();}
+window.closeDisco=function(){showMain();};
 
 // ── EXPORT ──
-function exportExcel(){
+window.exportExcel=function(){
   if(!collection.length){showToast('Nothing to export');return;}
   const rows=collection.map(a=>({Artist:a.artist||'',Title:a.title||'',Year:a.year||'',Genre:a.genre||'',Barcode:a.barcode||'',Memo:a.memo||'',Added:a.addedAt?new Date(a.addedAt).toLocaleDateString():''}));
   const ws=XLSX.utils.json_to_sheet(rows);
   const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Collection');
   XLSX.writeFile(wb,'cd-shelf.xlsx');showToast('Exported');
-}
+};
 
 // ── UTILS ──
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 function escHTML(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function escAttr(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
+// ── INIT ──
 initDB().then(loadCollection);
 </script>
 </body>
