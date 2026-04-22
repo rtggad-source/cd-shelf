@@ -121,7 +121,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .scan-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
 
 .scan-camera-panel{display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px;width:100%;}
-#reader{width:100%;max-width:360px;border:1px solid var(--border) !important;background:#000;}
+#reader{width:100%;max-width:360px;border:1px solid var(--border) !important;background:#111;}
 #reader video{border-radius:0 !important;}
 #reader__scan_region{border:none !important;background:transparent !important;}
 #reader__scan_region img{display:none !important;}
@@ -446,7 +446,7 @@ async function deleteAlbum(){
   updateStats();buildGenreFilterChips();renderCollection();closeSheet();showToast('Removed');
 }
 
-// ── CAMERA ──
+// ── CAMERA ── facingMode方式に戻す
 function openScan(tab){
   document.getElementById('scanOverlay').classList.add('open');
   clearScanStatus();
@@ -475,52 +475,55 @@ function switchScanTab(tab){
 
 function startCamera(){
   if(scannerRunning)return;
-  if(html5QrCode){html5QrCode.clear();html5QrCode=null;}
-  html5QrCode=new Html5Qrcode('reader',{verbose:false});
-
-  Html5Qrcode.getCameras().then(cameras=>{
-    if(!cameras||!cameras.length){setStatus('scanStatus','No camera found');return;}
-
-    // ラベルに "back" を含むカメラを優先（"facing back" や "camera 0, facing back" に対応）
-    const backCam=cameras.find(c=>/back/i.test(c.label));
-    const cam=backCam||cameras[cameras.length-1];
-
-    html5QrCode.start(
-      cam.id,
-      {
-        fps:15,
-        qrbox:{width:280,height:100},
-        aspectRatio:1.7,
-        experimentalFeatures:{useBarCodeDetectorIfSupported:true},
-        formatsToSupport:[
-          Html5QrcodeSupportedFormats.EAN_13,
-          Html5QrcodeSupportedFormats.EAN_8,
-          Html5QrcodeSupportedFormats.UPC_A,
-          Html5QrcodeSupportedFormats.UPC_E
-        ]
-      },
-      async(code)=>{
-        if(!scannerRunning)return;
-        scannerRunning=false;
-        setStatus('scanStatus',`Found: ${code}`);
-        await processBarcode(code,'scanStatus');
-      },
-      ()=>{}
-    ).then(()=>{
-      scannerRunning=true;
-      setupTapFocus();
-    }).catch(err=>{
-      console.warn('Camera start error:',err);
-      setStatus('scanStatus','Camera error: '+err);
+  // 前のインスタンスを確実に破棄
+  if(html5QrCode){
+    html5QrCode.stop().catch(()=>{}).finally(()=>{
+      html5QrCode.clear();
+      html5QrCode=null;
+      _startCamera();
     });
+  } else {
+    _startCamera();
+  }
+}
+
+function _startCamera(){
+  html5QrCode=new Html5Qrcode('reader',{verbose:false});
+  html5QrCode.start(
+    {facingMode:'environment'},
+    {
+      fps:15,
+      qrbox:{width:280,height:100},
+      aspectRatio:1.7,
+      experimentalFeatures:{useBarCodeDetectorIfSupported:true},
+      formatsToSupport:[
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E
+      ]
+    },
+    async(code)=>{
+      if(!scannerRunning)return;
+      scannerRunning=false;
+      setStatus('scanStatus',`Found: ${code}`);
+      await processBarcode(code,'scanStatus');
+    },
+    ()=>{}
+  ).then(()=>{
+    scannerRunning=true;
+    setupTapFocus();
   }).catch(err=>{
-    console.warn('getCameras error:',err);
+    console.warn('Camera error:',err);
     setStatus('scanStatus','Camera error: '+err);
   });
 }
 
 function stopCamera(){
-  if(html5QrCode&&scannerRunning){html5QrCode.stop().catch(()=>{});scannerRunning=false;}
+  if(html5QrCode&&scannerRunning){
+    html5QrCode.stop().catch(()=>{});
+    scannerRunning=false;
+  }
 }
 
 function setupTapFocus(){
