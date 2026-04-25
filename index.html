@@ -54,12 +54,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .album-grid.open{display:grid;}
 .album-card{background:var(--surface);border:1px solid var(--border);cursor:pointer;position:relative;overflow:hidden;}
 .album-card:active{border-color:var(--accent);}
-.album-art{width:100%;aspect-ratio:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.album-art{width:100%;aspect-ratio:1;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
 .album-art img{width:100%;height:100%;object-fit:cover;display:block;}
 .album-art-ph{font-size:28px;color:var(--text3);}
-/* ジャケットなしの場合タップで検索できることを示す */
-.album-art.no-cover{cursor:pointer;position:relative;}
-.album-art.no-cover::after{content:'🔍';position:absolute;bottom:4px;right:4px;font-size:14px;opacity:0.6;}
+.album-art.no-cover::after{content:'🔍';position:absolute;bottom:4px;right:4px;font-size:14px;opacity:0.5;}
 .album-info{padding:8px 10px 10px;}
 .album-artist-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;}
 .album-title-label{font-size:12px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
@@ -95,9 +93,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .sheet-art{width:80px;height:80px;background:var(--surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;}
 .sheet-art img{width:100%;height:100%;object-fit:cover;}
 .sheet-art-ph{font-size:28px;color:var(--text3);}
-/* ジャケットなしの場合タップで検索 */
 .sheet-art.no-cover{cursor:pointer;border:1px dashed var(--border);}
-.sheet-art.no-cover::after{content:'Tap to find cover';position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);color:var(--accent);font-family:'DM Mono',monospace;font-size:8px;text-align:center;padding:3px;letter-spacing:0.5px;}
+.sheet-art.no-cover::after{content:'Tap to find';position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.75);color:var(--accent);font-family:'DM Mono',monospace;font-size:8px;text-align:center;padding:3px;letter-spacing:0.5px;}
 .sheet-artist{font-family:'DM Mono',monospace;font-size:10px;color:var(--accent2);letter-spacing:1px;text-transform:uppercase;}
 .sheet-title{font-size:17px;font-weight:500;margin:4px 0;line-height:1.3;}
 .sheet-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
@@ -117,7 +114,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .track-dur{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);}
 .loading-tracks{padding:16px 0;text-align:center;font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);}
 
-/* SCAN */
 .scan-overlay{position:fixed;inset:0;background:#000;z-index:300;display:none;flex-direction:column;align-items:center;overflow-y:auto;}
 .scan-overlay.open{display:flex;}
 .scan-top-bar{display:flex;align-items:center;justify-content:space-between;width:100%;padding:16px 20px;flex-shrink:0;}
@@ -140,7 +136,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 @keyframes scanBar{from{top:5%}to{top:95%}}
 .scan-hint-txt{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-align:center;line-height:1.8;letter-spacing:1px;}
 .scan-status{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);text-align:center;min-height:16px;padding:0 20px;}
-
 .scan-manual-panel{display:none;flex-direction:column;gap:12px;padding:20px;width:100%;}
 .scan-manual-panel.active{display:flex;}
 .field-group{display:flex;flex-direction:column;gap:6px;}
@@ -153,23 +148,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .scan-lookup-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);}
 .scan-divider{font-family:'DM Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-align:center;}
 
-/* 検索候補リスト */
-.candidates-list{display:flex;flex-direction:column;gap:2px;max-height:300px;overflow-y:auto;}
+/* 候補リスト */
+.candidates-list{display:flex;flex-direction:column;gap:2px;}
 .candidate-item{display:flex;align-items:center;gap:12px;padding:10px;background:var(--surface);border:1px solid var(--border);cursor:pointer;}
 .candidate-item:active{border-color:var(--accent);}
-.candidate-art{width:44px;height:44px;background:var(--surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.candidate-art{width:44px;height:44px;background:var(--surface2);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--text3);}
 .candidate-art img{width:100%;height:100%;object-fit:cover;}
 .candidate-info{flex:1;min-width:0;}
 .candidate-title{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.candidate-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:2px;}
+.candidate-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-/* ジャケット写真撮影 */
-.jacket-photo-area{display:flex;flex-direction:column;gap:8px;}
-.jacket-preview{width:100%;aspect-ratio:1;background:var(--surface2);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;max-width:160px;margin:0 auto;}
-.jacket-preview img{width:100%;height:100%;object-fit:cover;}
-.jacket-preview-ph{font-size:32px;color:var(--text3);}
-.photo-btn{background:var(--surface2);color:var(--text2);border:1px solid var(--border);padding:9px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;cursor:pointer;width:100%;text-align:center;}
-/* hidden file input */
+/* ジャケット写真選択 (hidden file input) */
 #jacketFileInput{display:none;}
 
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);display:flex;padding-bottom:var(--safe);z-index:50;}
@@ -262,6 +251,9 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   </div>
 </div>
 
+<!-- hidden file input for jacket photo -->
+<input type="file" id="jacketFileInput" accept="image/*" capture="environment" onchange="handleJacketPhoto(event)">
+
 <!-- SCAN -->
 <div class="scan-overlay" id="scanOverlay">
   <div class="scan-top-bar">
@@ -274,7 +266,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div class="scan-tab" id="stManual" onclick="switchScanTab('manual')">✎ Manual</div>
   </div>
 
-  <!-- CAMERA TAB -->
   <div class="scan-camera-panel" id="panelCamera">
     <div class="scan-hint-txt">Hold barcode steady · Tap screen to focus</div>
     <div class="reader-wrap">
@@ -290,7 +281,6 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div class="scan-status" id="scanStatus"></div>
   </div>
 
-  <!-- BARCODE TAB -->
   <div class="scan-manual-panel" id="panelBarcode">
     <div class="field-group">
       <div class="field-label">Barcode Number</div>
@@ -302,37 +292,20 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div class="scan-status" id="barcodeStatus"></div>
   </div>
 
-  <!-- MANUAL TAB -->
   <div class="scan-manual-panel" id="panelManual">
-
-    <!-- ジャケット写真 -->
-    <div class="field-group">
-      <div class="field-label">Jacket Photo (optional)</div>
-      <div class="jacket-photo-area">
-        <div class="jacket-preview" id="jacketPreview">
-          <div class="jacket-preview-ph">📷</div>
-        </div>
-        <button class="photo-btn" onclick="document.getElementById('jacketFileInput').click()">📷 Take / Choose Photo</button>
-        <input type="file" id="jacketFileInput" accept="image/*" capture="environment" onchange="handleJacketPhoto(event)">
-      </div>
-    </div>
-
-    <!-- 検索フィールド -->
     <div class="field-group">
       <div class="field-label">Artist</div>
-      <input class="field-input" id="manArtist" type="text" placeholder="e.g. Radiohead (optional)">
+      <input class="field-input" id="manArtist" type="text" placeholder="e.g. Radiohead">
     </div>
     <div class="field-group">
-      <div class="field-label">Album Title</div>
-      <input class="field-input" id="manTitle" type="text" placeholder="e.g. OK Computer (optional)">
+      <div class="field-label">Album Title (optional)</div>
+      <input class="field-input" id="manTitle" type="text" placeholder="e.g. OK Computer">
     </div>
-    <button class="scan-lookup-btn" onclick="searchMB()">🔍 SEARCH MUSICBRAINZ</button>
+    <button class="scan-lookup-btn" onclick="searchMB()">🔍 SEARCH</button>
 
-    <!-- 候補リスト -->
     <div id="candidatesList" class="candidates-list hidden"></div>
 
     <div class="scan-divider">— or add directly —</div>
-
     <div class="field-row">
       <div class="field-group">
         <div class="field-label">Year</div>
@@ -383,7 +356,8 @@ function buildGenreFilterChips(){
 let db,collection=[],viewMode='grid',activeGenre='';
 let currentAlbumId=null,openArtistGroups=new Set();
 let qrCode=null;
-let manualJacketDataUrl=null; // 撮影したジャケット写真
+// ジャケット写真用: アルバムIDをキーに保持
+let pendingJacketAlbumId=null;
 
 function initDB(){
   return new Promise((res,rej)=>{
@@ -443,16 +417,15 @@ function renderArtistView(c,items){
 function albumCardHTML(a){
   const hasCover=!!(a.coverUrl||a.coverData);
   const imgHTML=a.coverData
-    ? `<img src="${a.coverData}" alt="" loading="lazy">`
-    : a.coverUrl
-      ? `<img src="${escAttr(a.coverUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-      : `<div class="album-art-ph">💿</div>`;
-  const artClass=hasCover?'album-art':'album-art no-cover';
-  const artClick=hasCover?`onclick="openSheet(${a.id})"`:`onclick="fetchCoverForCard(event,${a.id})"`;
+    ?`<img src="${a.coverData}" alt="" loading="lazy">`
+    :a.coverUrl
+      ?`<img src="${escAttr(a.coverUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
+      :`<div class="album-art-ph">💿</div>`;
+  const artClass=`album-art${hasCover?'':' no-cover'}`;
+  // ジャケットなしの場合、アート部分タップで検索、カード全体タップはopenSheet
+  const artOnclick=hasCover?'':`onclick="event.stopPropagation();fetchCoverTap(${a.id})"`;
   return`<div class="album-card" onclick="openSheet(${a.id})">
-    <div class="${artClass}" ${!hasCover?`onclick="event.stopPropagation();fetchCoverForCard(event,${a.id})"`:''}>
-      ${imgHTML}
-    </div>
+    <div class="${artClass}" ${artOnclick}>${imgHTML}</div>
     <div class="album-info">
       <div class="album-artist-label" onclick="event.stopPropagation();openDisco('${escAttr(a.artist||'')}')">${escHTML(a.artist||'')}</div>
       <div class="album-title-label">${escHTML(a.title||'')}</div>
@@ -464,12 +437,29 @@ function toggleArtistGroup(artist){openArtistGroups.has(artist)?openArtistGroups
 function setViewMode(mode,el){viewMode=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');openArtistGroups.clear();renderCollection();}
 function setGenreFilter(genre,el){activeGenre=genre;document.querySelectorAll('#genreFilterBar .chip').forEach(c=>c.classList.remove('active'));el.classList.add('active');renderCollection();}
 
-// ── ジャケットなし → タップで自動取得 ──
-async function fetchCoverForCard(e,id){
-  e.stopPropagation();
+// ── ジャケット取得フロー ──
+// Cover Art Archive (mbid) → Cover Art Archive (rgid) → iTunes → 見つからなければ写真選択を促す
+async function findCoverUrl(artist,title,mbid,rgid){
+  if(mbid){
+    try{const r=await fetch(`https://coverartarchive.org/release/${mbid}/front-250`,{method:'HEAD'});if(r.ok)return`https://coverartarchive.org/release/${mbid}/front-250`;}catch{}
+  }
+  if(rgid){
+    try{const r=await fetch(`https://coverartarchive.org/release-group/${rgid}/front-250`,{method:'HEAD'});if(r.ok)return`https://coverartarchive.org/release-group/${rgid}/front-250`;}catch{}
+  }
+  try{
+    const q=encodeURIComponent(`${artist||''} ${title||''}`.trim());
+    const r=await fetch(`https://itunes.apple.com/search?term=${q}&media=music&entity=album&limit=1`);
+    const d=await r.json();
+    if(d.results?.length)return d.results[0].artworkUrl100.replace('100x100bb','600x600bb');
+  }catch{}
+  return null;
+}
+
+// グリッドのジャケットなしタップ
+async function fetchCoverTap(id){
   const a=collection.find(x=>x.id===id);
   if(!a||a.coverUrl||a.coverData)return;
-  showToast('Searching cover art...');
+  showToast('Searching cover...');
   const url=await findCoverUrl(a.artist,a.title,a.mbid,a.releaseGroupId);
   if(url){
     a.coverUrl=url;
@@ -477,37 +467,70 @@ async function fetchCoverForCard(e,id){
     renderCollection();
     showToast('Cover found!');
   }else{
-    showToast('No cover found');
+    // 見つからなければ写真選択を促す
+    showToast('Not found — choose a photo');
+    pendingJacketAlbumId=id;
+    document.getElementById('jacketFileInput').click();
   }
 }
 
-// Cover Art Archive → iTunes fallback
-async function findCoverUrl(artist,title,mbid,rgid){
-  // 1. Cover Art Archive (mbid直接)
-  if(mbid){
-    try{
-      const r=await fetch(`https://coverartarchive.org/release/${mbid}/front-250`,{method:'HEAD'});
-      if(r.ok)return`https://coverartarchive.org/release/${mbid}/front-250`;
-    }catch{}
+// sheetのジャケットなしタップ
+async function fetchCoverFromSheet(id){
+  const a=collection.find(x=>x.id===id);if(!a)return;
+  showToast('Searching cover...');
+  const url=await findCoverUrl(a.artist,a.title,a.mbid,a.releaseGroupId);
+  if(url){
+    a.coverUrl=url;
+    await dbPut('albums',a);
+    // sheet画像を更新
+    const artEl=document.getElementById('sheetArt');
+    artEl.className='sheet-art';
+    artEl.innerHTML=`<img src="${escAttr(url)}" alt="">`;
+    artEl.onclick=null;
+    renderCollection();
+    showToast('Cover found!');
+  }else{
+    showToast('Not found — choose a photo');
+    pendingJacketAlbumId=id;
+    document.getElementById('jacketFileInput').click();
   }
-  // 2. Cover Art Archive (release group)
-  if(rgid){
-    try{
-      const r=await fetch(`https://coverartarchive.org/release-group/${rgid}/front-250`,{method:'HEAD'});
-      if(r.ok)return`https://coverartarchive.org/release-group/${rgid}/front-250`;
-    }catch{}
-  }
-  // 3. iTunes API fallback
-  try{
-    const q=encodeURIComponent(`${artist||''} ${title||''}`.trim());
-    const r=await fetch(`https://itunes.apple.com/search?term=${q}&media=music&entity=album&limit=1`);
-    const d=await r.json();
-    if(d.results?.length){
-      // 100x100 → 500x500に置換
-      return d.results[0].artworkUrl100.replace('100x100','500x500');
-    }
-  }catch{}
-  return null;
+}
+
+// ファイル選択後の処理（ジャケット写真を圧縮して保存）
+function handleJacketPhoto(e){
+  const file=e.target.files[0];
+  e.target.value='';
+  if(!file||!pendingJacketAlbumId)return;
+  const albumId=pendingJacketAlbumId;
+  pendingJacketAlbumId=null;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=async()=>{
+      const canvas=document.createElement('canvas');
+      const max=400;
+      let w=img.width,h=img.height;
+      if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.75);
+      const a=collection.find(x=>x.id===albumId);
+      if(!a)return;
+      a.coverData=dataUrl;
+      await dbPut('albums',a);
+      renderCollection();
+      // sheetが開いていれば更新
+      if(currentAlbumId===albumId){
+        const artEl=document.getElementById('sheetArt');
+        artEl.className='sheet-art';
+        artEl.innerHTML=`<img src="${dataUrl}" alt="">`;
+        artEl.onclick=null;
+      }
+      showToast('Photo saved as cover!');
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 // ── SHEET ──
@@ -519,7 +542,6 @@ async function openSheet(id){
   document.getElementById('sheetMeta').textContent=a.year||'';
   document.getElementById('memoArea').value=a.memo||'';
   buildGenreSelect('genreSelect',a.genre||'');
-
   const artEl=document.getElementById('sheetArt');
   if(a.coverData){
     artEl.className='sheet-art';
@@ -534,7 +556,6 @@ async function openSheet(id){
     artEl.innerHTML=`<div class="sheet-art-ph">💿</div>`;
     artEl.onclick=()=>fetchCoverFromSheet(id);
   }
-
   document.getElementById('sheet').classList.add('open');
   document.getElementById('sheetOverlay').classList.add('open');
   const tr=document.getElementById('sheetTracks');
@@ -546,26 +567,6 @@ async function openSheet(id){
     }catch{tr.innerHTML='<div class="loading-tracks" style="color:var(--text3)">Could not load</div>';}
   }else{tr.innerHTML='<div class="loading-tracks" style="color:var(--text3)">No data</div>';}
 }
-
-async function fetchCoverFromSheet(id){
-  const a=collection.find(x=>x.id===id);if(!a)return;
-  showToast('Searching cover art...');
-  const url=await findCoverUrl(a.artist,a.title,a.mbid,a.releaseGroupId);
-  if(url){
-    a.coverUrl=url;
-    await dbPut('albums',a);
-    // sheetの画像を更新
-    const artEl=document.getElementById('sheetArt');
-    artEl.className='sheet-art';
-    artEl.innerHTML=`<img src="${escAttr(url)}" alt="">`;
-    artEl.onclick=null;
-    renderCollection();
-    showToast('Cover found!');
-  }else{
-    showToast('No cover found');
-  }
-}
-
 function closeSheet(){document.getElementById('sheet').classList.remove('open');document.getElementById('sheetOverlay').classList.remove('open');currentAlbumId=null;}
 async function saveSheet(){
   if(!currentAlbumId)return;
@@ -592,11 +593,11 @@ function closeScan(){
   stopCamera();
   document.getElementById('scanOverlay').classList.remove('open');
   clearScanStatus();
-  // ジャケット写真リセット
-  manualJacketDataUrl=null;
-  document.getElementById('jacketPreview').innerHTML='<div class="jacket-preview-ph">📷</div>';
   document.getElementById('candidatesList').classList.add('hidden');
   document.getElementById('candidatesList').innerHTML='';
+  document.getElementById('manArtist').value='';
+  document.getElementById('manTitle').value='';
+  document.getElementById('manYear').value='';
 }
 function clearScanStatus(){
   ['scanStatus','barcodeStatus','manualStatus'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='';});
@@ -648,60 +649,60 @@ async function processBarcode(barcode,statusId){
 }
 function setStatus(id,msg){const el=document.getElementById(id);if(el)el.textContent=msg;}
 
-// ── ジャケット写真撮影 ──
-function handleJacketPhoto(e){
-  const file=e.target.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    // 低画素に圧縮（300x300 max）
-    const img=new Image();
-    img.onload=()=>{
-      const canvas=document.createElement('canvas');
-      const max=300;
-      let w=img.width,h=img.height;
-      if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}
-      canvas.width=w;canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      manualJacketDataUrl=canvas.toDataURL('image/jpeg',0.7);
-      document.getElementById('jacketPreview').innerHTML=`<img src="${manualJacketDataUrl}" alt="">`;
-    };
-    img.src=ev.target.result;
-  };
-  reader.readAsDataURL(file);
-  // inputをリセット（同じファイルを再選択できるように）
-  e.target.value='';
-}
+// ── MANUAL検索（アーティスト名だけでもOK）──
+document.getElementById('manArtist').addEventListener('keydown',e=>{if(e.key==='Enter')searchMB();});
+document.getElementById('manTitle').addEventListener('keydown',e=>{if(e.key==='Enter')searchMB();});
 
-// ── MusicBrainz 検索（候補リスト表示）──
 async function searchMB(){
   const artist=document.getElementById('manArtist').value.trim();
   const title=document.getElementById('manTitle').value.trim();
-  if(!artist&&!title){setStatus('manualStatus','Enter artist or title to search.');return;}
+  if(!artist&&!title){setStatus('manualStatus','Enter artist name or album title.');return;}
+
   setStatus('manualStatus','Searching...');
-  document.getElementById('candidatesList').classList.add('hidden');
-  document.getElementById('candidatesList').innerHTML='';
+  const list=document.getElementById('candidatesList');
+  list.classList.add('hidden');
+  list.innerHTML='';
 
   try{
+    // クエリ構築: 片方だけでもOK
     let query='';
-    if(artist&&title) query=`artist:"${artist}" AND release:"${title}"`;
-    else if(artist) query=`artist:"${artist}"`;
-    else query=`release:"${title}"`;
+    if(artist&&title){
+      query=`artist:"${artist}" AND release:"${title}"`;
+    }else if(artist){
+      // アーティスト名だけの場合はrelease-groupで検索
+      query=`artist:"${artist}"`;
+    }else{
+      query=`release:"${title}"`;
+    }
 
-    const q=encodeURIComponent(query);
-    const res=await fetch(`https://musicbrainz.org/ws/2/release/?query=${q}&fmt=json&limit=8`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
+    const url=`https://musicbrainz.org/ws/2/release/?query=${encodeURIComponent(query)}&fmt=json&limit=8&inc=artist-credits`;
+    const res=await fetch(url,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
+
+    if(!res.ok){setStatus('manualStatus','Network error. Try again.');return;}
     const data=await res.json();
 
-    if(!data.releases?.length){setStatus('manualStatus','Not found. Use "Add Without Lookup".');return;}
+    if(!data.releases||data.releases.length===0){
+      setStatus('manualStatus','No results. Check spelling or try title too.');
+      return;
+    }
 
-    setStatus('manualStatus','Select an album below:');
-    const list=document.getElementById('candidatesList');
+    // 重複タイトルを除外（同一アーティスト+タイトルは1件に）
+    const seen=new Set();
+    const unique=data.releases.filter(rel=>{
+      const key=`${rel['artist-credit']?.[0]?.artist?.name||''}::${rel.title}`;
+      if(seen.has(key))return false;
+      seen.add(key);return true;
+    });
+
+    setStatus('manualStatus',`${unique.length} result${unique.length!==1?'s':''} — tap to add`);
     list.classList.remove('hidden');
+    list._candidates=unique;
 
-    list.innerHTML=data.releases.map((rel,i)=>{
+    list.innerHTML=unique.map((rel,i)=>{
       const a=rel['artist-credit']?.[0]?.artist?.name||'';
       const y=rel.date?rel.date.slice(0,4):'';
       return`<div class="candidate-item" onclick="selectCandidate(${i})">
-        <div class="candidate-art"><div style="font-size:20px;color:var(--text3)">💿</div></div>
+        <div class="candidate-art">💿</div>
         <div class="candidate-info">
           <div class="candidate-title">${escHTML(rel.title)}</div>
           <div class="candidate-sub">${escHTML(a)}${y?' · '+y:''}</div>
@@ -709,42 +710,39 @@ async function searchMB(){
       </div>`;
     }).join('');
 
-    // 候補データを一時保存
-    list._candidates=data.releases;
-  }catch(e){console.error(e);setStatus('manualStatus','Error. Check connection.');}
+  }catch(e){
+    console.error(e);
+    setStatus('manualStatus','Error. Check connection.');
+  }
 }
 
 async function selectCandidate(i){
   const list=document.getElementById('candidatesList');
-  const rel=list._candidates[i];
+  const rel=list._candidates?.[i];
   if(!rel)return;
   setStatus('manualStatus','Adding...');
   list.classList.add('hidden');
 
-  const mbid=rel.id,rgid=rel['release-group']?.id;
-  const artist=rel['artist-credit']?.[0]?.artist?.name||document.getElementById('manArtist').value.trim();
+  const mbid=rel.id;
+  const rgid=rel['release-group']?.id;
+  const artist=rel['artist-credit']?.[0]?.artist?.name||document.getElementById('manArtist').value.trim()||'Unknown Artist';
   const year=rel.date?parseInt(rel.date):null;
 
   if(collection.find(a=>a.mbid===mbid)){showToast('Already in collection');closeScan();return;}
 
   let genre='';
-  try{
-    const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
-    const td=await tr.json();
-    const tags=td.tags||[];
-    if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);
-  }catch{}
+  if(rgid){
+    try{
+      const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${rgid}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
+      const td=await tr.json();
+      const tags=td.tags||[];
+      if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);
+    }catch{}
+  }
 
-  // ジャケット取得
-  let coverUrl=await findCoverUrl(artist,rel.title,mbid,rgid);
+  const coverUrl=await findCoverUrl(artist,rel.title,mbid,rgid);
 
-  const album={
-    mbid,releaseGroupId:rgid,artist,
-    title:rel.title,year,genre,
-    coverUrl:coverUrl||null,
-    coverData:manualJacketDataUrl||null, // 写真があれば優先
-    memo:'',addedAt:Date.now()
-  };
+  const album={mbid,releaseGroupId:rgid,artist,title:rel.title,year,genre,coverUrl:coverUrl||null,coverData:null,memo:'',addedAt:Date.now()};
   const id=await dbPut('albums',album);album.id=id;collection.push(album);
   updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${album.title}`);
 }
@@ -758,9 +756,7 @@ async function addManual(){
     title:title||'Unknown Title',
     year:parseInt(document.getElementById('manYear').value)||null,
     genre:document.getElementById('manGenre').value||'',
-    coverUrl:null,
-    coverData:manualJacketDataUrl||null,
-    memo:'',addedAt:Date.now()
+    coverUrl:null,coverData:null,memo:'',addedAt:Date.now()
   };
   const id=await dbPut('albums',album);album.id=id;collection.push(album);
   updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${album.title}`);
@@ -786,7 +782,6 @@ function mapGenre(raw){
   const map=[['alternative rock','Alternative Rock'],['alt-rock','Alternative Rock'],['ambient','Ambient'],['blues','Blues'],['classical','Classical'],['country','Country'],['dream pop','Dream Pop'],['electronic','Electronic'],['electronica','Electronic'],['experimental','Experimental'],['folk','Folk'],['funk','Funk'],['gospel','Gospel'],['grunge','Grunge'],['hard rock','Hard Rock'],['heavy metal','Heavy Metal'],['metal','Heavy Metal'],['hip hop','Hip-Hop'],['hip-hop','Hip-Hop'],['rap','Hip-Hop'],['house','House'],['indie rock','Indie Rock'],['indie','Indie Rock'],['jazz','Jazz'],['j-pop','J-Pop'],['jpop','J-Pop'],['j-rock','J-Rock'],['jrock','J-Rock'],['latin','Latin'],['math rock','Math Rock'],['new wave','New Wave'],['noise rock','Noise Rock'],['pop','Pop'],['post-punk','Post-Punk'],['post-rock','Post-Rock'],['progressive rock','Progressive Rock'],['prog rock','Progressive Rock'],['psychedelic','Psychedelic Rock'],['punk','Punk'],['r&b','R&B / Soul'],['soul','R&B / Soul'],['rhythm and blues','R&B / Soul'],['reggae','Reggae'],['rock','Rock'],['shoegaze','Shoegaze'],['singer-songwriter','Singer-Songwriter'],['ska','Ska'],['soundtrack','Soundtrack'],['synth-pop','Synth-Pop'],['synthpop','Synth-Pop'],['techno','Techno'],['trip-hop','Trip-Hop'],['trip hop','Trip-Hop'],['world','World'],['world music','World']];
   for(const[k,v]of map)if(r.includes(k))return v;return'';
 }
-
 async function fetchTracklist(mbid){
   const res=await fetch(`https://musicbrainz.org/ws/2/release/${mbid}?inc=recordings&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
   const data=await res.json();
@@ -821,7 +816,7 @@ async function openDisco(artistName){
       const isOwned=ownedRGIDs.has(rg.id);
       const year=rg['first-release-date']?rg['first-release-date'].slice(0,4):'—';
       const oa=collection.find(a=>a.releaseGroupId===rg.id);
-      const imgHTML=oa?.coverData?`<img src="${oa.coverData}" alt="">`:oa?.coverUrl?`<img src="${escAttr(oa.coverUrl)}" alt="" loading="lazy">`:'<div style="font-size:18px;color:var(--text3)">💿</div>';
+      const imgHTML=oa?.coverData?`<img src="${oa.coverData}" alt="">`:oa?.coverUrl?`<img src="${escAttr(oa.coverUrl)}" alt="" loading="lazy">`:'💿';
       return`<div class="disco-item ${isOwned?'owned':''}">
         <div class="disco-art">${imgHTML}</div>
         <div class="disco-info"><div class="disco-title">${escHTML(rg.title)}</div><div class="disco-year">${year}</div></div>
