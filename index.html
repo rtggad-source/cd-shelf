@@ -362,9 +362,11 @@ let pendingJacketAlbumId=null;
 
 function initDB(){
   return new Promise((res,rej)=>{
-    const req=indexedDB.open('ShelfDB',3);
+    // バージョン5: 3→4で消えたデータを救出するため5に上げて再マイグレーション
+    const req=indexedDB.open('ShelfDB',5);
     req.onupgradeneeded=e=>{
       const d=e.target.result;
+      // albumsストアがなければ作成（どのバージョンからのアップグレードでも対応）
       if(!d.objectStoreNames.contains('albums'))
         d.createObjectStore('albums',{keyPath:'id',autoIncrement:true});
     };
@@ -699,6 +701,7 @@ async function searchMB(){
   setStatus('manualStatus',`${combined.length} result${combined.length!==1?'s':''} — tap to add`);
   list.classList.remove('hidden');
   list._candidates=combined;
+  window._shelfCandidates=combined;
 
   list.innerHTML=combined.map((item,i)=>{
     const y=item.year?item.year:'';
@@ -764,7 +767,7 @@ async function searchITunes(artist,title){
 
 async function selectCandidate(i){
   const list=document.getElementById('candidatesList');
-  const item=list._candidates?.[i];
+  const item=(window._shelfCandidates||list._candidates)?.[i];
   if(!item)return;
 
   // 重複チェック
@@ -866,12 +869,8 @@ async function fetchByBarcode(barcode){
 
   // 3. Discogs（日本国内盤バーコードに強い）
   try{
-    const res=await fetch(`https://api.discogs.com/database/search?barcode=${barcode}&type=release&per_page=1`,{
-      headers:{
-        'Authorization':`Discogs token=${DISCOGS_TOKEN}`,
-        'User-Agent':'ShelfApp/1.0'
-      }
-    });
+    const discogsUrl=`https://api.discogs.com/database/search?barcode=${barcode}&type=release&per_page=1&token=${DISCOGS_TOKEN}`;
+    const res=await fetch(discogsUrl,{headers:{'User-Agent':'ShelfApp/1.0 +https://github.com'}});
     const data=await res.json();
     if(data.results?.length){
       const r=data.results[0];
@@ -879,11 +878,26 @@ async function fetchByBarcode(barcode){
       const artist=parts.length>=2?parts[0]:'Unknown Artist';
       const title=parts.length>=2?parts.slice(1).join(' - '):r.title||'Unknown Title';
       const year=r.year?parseInt(r.year):null;
-      const coverUrl=r.cover_image||r.thumb||null;
+      const coverUrl=r.cover_image&&!r.cover_image.includes('spacer')?r.cover_image:r.thumb||null;
       const genre=mapGenre((r.genre?.[0]||r.style?.[0]||''));
       return{mbid:null,releaseGroupId:null,artist,title,year,genre,coverUrl,coverData:null,memo:''};
     }
   }catch(e){console.warn('Discogs barcode error:',e);}
+
+  // 4. iTunes国コード別に再試行（日本ストア）
+  try{
+    const res=await fetch(`https://itunes.apple.com/lookup?upc=${barcode}&country=JP&entity=album`);
+    const data=await res.json();
+    if(data.results?.length){
+      const r=data.results[0];
+      const artist=r.artistName||'Unknown Artist';
+      const title=r.collectionName||'Unknown Title';
+      const year=r.releaseDate?parseInt(r.releaseDate.slice(0,4)):null;
+      const coverUrl=r.artworkUrl100?r.artworkUrl100.replace('100x100','600x600'):null;
+      const genre=mapGenre(r.primaryGenreName||'');
+      return{mbid:null,releaseGroupId:null,artist,title,year,genre,coverUrl,coverData:null,memo:''};
+    }
+  }catch(e){console.warn('iTunes JP barcode error:',e);}
 
   return null;
 }
