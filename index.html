@@ -336,7 +336,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 <div class="toast" id="toast"></div>
 
 <script>
-const DISCOGS_TOKEN=LuZhyGtuBZQwNJrNHridYaFFxKuFdbYVZrVHSlRx;
+const DISCOGS_TOKEN='LuZhyGtuBZQwNJrNHridYaFFxKuFdbYVZrVHSlRx';
 const GENRES=['Alternative Rock','Ambient','Blues','Classical','Country','Dream Pop','Electronic','Experimental','Folk','Funk','Gospel','Grunge','Hard Rock','Heavy Metal','Hip-Hop','House','Indie Rock','Jazz','J-Pop','J-Rock','Latin','Math Rock','New Wave','Noise Rock','Pop','Post-Punk','Post-Rock','Progressive Rock','Psychedelic Rock','Punk','R&B / Soul','Reggae','Rock','Shoegaze','Singer-Songwriter','Ska','Soundtrack','Synth-Pop','Techno','Trip-Hop','World','Other'];
 
 function buildGenreSelect(elId,current){
@@ -362,7 +362,7 @@ let pendingJacketAlbumId=null;
 
 function initDB(){
   return new Promise((res,rej)=>{
-    const req=indexedDB.open('ShelfDB',4);
+    const req=indexedDB.open('ShelfDB',3);
     req.onupgradeneeded=e=>{
       const d=e.target.result;
       if(!d.objectStoreNames.contains('albums'))
@@ -616,17 +616,27 @@ function switchScanTab(tab){
   if(tab==='manual')buildGenreSelect('manGenre','');
 }
 function startCamera(){
-  qrCode=new Html5Qrcode('reader');
-  qrCode.start(
-    {facingMode:'environment'},
-    {fps:10,qrbox:{width:240,height:100}},
-    async(code)=>{
-      setStatus('scanStatus','Found: '+code);
-      await stopCameraAsync();
-      await processBarcode(code,'scanStatus');
-    },
-    ()=>{}
-  ).catch(err=>setStatus('scanStatus','Camera error: '+err));
+  // 前のインスタンスが残っていれば先に止める
+  const prev=qrCode;
+  qrCode=null;
+  const doStart=()=>{
+    // readerのDOMをリセット
+    const readerEl=document.getElementById('reader');
+    readerEl.innerHTML='';
+    qrCode=new Html5Qrcode('reader');
+    qrCode.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:240,height:100}},
+      async(code)=>{
+        setStatus('scanStatus','Found: '+code);
+        await stopCameraAsync();
+        await processBarcode(code,'scanStatus');
+      },
+      ()=>{}
+    ).catch(err=>setStatus('scanStatus','Camera error: '+err));
+  };
+  if(prev){prev.stop().catch(()=>{}).finally(doStart);}
+  else{doStart();}
 }
 function stopCamera(){if(qrCode){qrCode.stop().catch(()=>{});qrCode=null;}}
 async function stopCameraAsync(){if(qrCode){try{await qrCode.stop();}catch{}qrCode=null;}}
@@ -756,32 +766,19 @@ async function selectCandidate(i){
   const list=document.getElementById('candidatesList');
   const item=list._candidates?.[i];
   if(!item)return;
-  setStatus('manualStatus','Adding...');
-  list.classList.add('hidden');
 
-  // MBソースの場合はmbidで重複チェック
+  // 重複チェック
   if(item.mbid&&collection.find(a=>a.mbid===item.mbid)){showToast('Already in collection');closeScan();return;}
 
+  // iTunesのカバーはすでに持っている
+  const coverUrl=item.coverUrl||null;
+  // iTunesのジャンル
   let genre='';
-  if(item.releaseGroupId){
-    try{
-      const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${item.releaseGroupId}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
-      const td=await tr.json();
-      const tags=td.tags||[];
-      if(tags.length)genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);
-    }catch{}
-  }
-  // iTunesソースのジャンルフォールバック
-  if(!genre&&item._source==='itunes'&&item._itunesData?.primaryGenreName){
+  if(item._source==='itunes'&&item._itunesData?.primaryGenreName){
     genre=mapGenre(item._itunesData.primaryGenreName);
   }
 
-  // カバー画像: iTunesはすでに持っている、MBは検索
-  let coverUrl=item.coverUrl||null;
-  if(!coverUrl){
-    coverUrl=await findCoverUrl(item.artist,item.title,item.mbid,item.releaseGroupId);
-  }
-
+  // まず即座に登録してUIを閉じる
   const album={
     mbid:item.mbid||null,
     releaseGroupId:item.releaseGroupId||null,
@@ -792,6 +789,31 @@ async function selectCandidate(i){
   };
   const id=await dbPut('albums',album);album.id=id;collection.push(album);
   updateStats();buildGenreFilterChips();renderCollection();closeScan();showToast(`Added: ${album.title}`);
+
+  // バックグラウンドでジャンル・カバーを補完
+  enrichAlbumInBackground(album);
+}
+
+async function enrichAlbumInBackground(album){
+  let changed=false;
+  // ジャンル補完（MBソースの場合）
+  if(!album.genre&&album.releaseGroupId){
+    try{
+      const tr=await fetch(`https://musicbrainz.org/ws/2/release-group/${album.releaseGroupId}?inc=tags&fmt=json`,{headers:{'User-Agent':'ShelfApp/1.0 (personal)'}});
+      const td=await tr.json();
+      const tags=td.tags||[];
+      if(tags.length){album.genre=mapGenre(tags.sort((a,b)=>b.count-a.count)[0].name);changed=true;}
+    }catch{}
+  }
+  // カバー補完
+  if(!album.coverUrl&&!album.coverData){
+    const url=await findCoverUrl(album.artist,album.title,album.mbid,album.releaseGroupId);
+    if(url){album.coverUrl=url;changed=true;}
+  }
+  if(changed){
+    await dbPut('albums',album);
+    renderCollection();
+  }
 }
 
 async function addManual(){
